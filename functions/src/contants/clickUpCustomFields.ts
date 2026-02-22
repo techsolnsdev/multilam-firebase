@@ -8,7 +8,7 @@ export const PURCHASE_ORDERS_CF_IDS = {
 }
 
 export const PO_LINES_CF_IDS = {
-  CODE: "24913788-1f3d-49b6-a902-35609b4068ac",
+  CODE: "723fad06-44ab-4096-a816-6a70fda46d13",
   SIZE: "5280d2cd-e0d0-4e71-8550-b1058c69edb1",
   THICKNESS: "625b7d09-cbbc-4baa-bc74-3eb40cf4841a",
   QUANTITY: "747f1224-f299-4083-a4e7-fdceb24cb347",

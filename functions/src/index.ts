@@ -11,6 +11,7 @@ export const db = getFirestore("production");
 export { init } from "./handlers/init";
 export { inventory } from "./handlers/clickup/inventory";
 export { loadSkus } from "./handlers/clickup/loadSkus";
-//export { recalculate } from "./handlers/clickup/recalculate";
+export { recalculate } from "./handlers/clickup/recalculate";
 export { skus } from "./handlers/skus";
 export { purchaseOrder } from "./handlers/purchaseOrder";
+export { poStatusUpdate, poEtaUpdate, poCloseUpdate } from "./utils/prueba";

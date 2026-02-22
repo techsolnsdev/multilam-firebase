@@ -278,6 +278,17 @@ export const purchaseOrder = onRequest(async (req, res) => {
         process.env.CLICKUP_LOGISTICS_LIST_ID as string,
         createLogisticsBody
       );
+      
+      const createExpenseConceptBody: createClickUpTaskBody = {
+        name: poRequest.orderNumber
+      };
+
+      action = "Sending create expense concept task request to ClickUp";
+      const clickupExpenseConceptTaskId = await createTaskFromTemplate(
+        process.env.CLICKUP_EC_TASK_TEMPLATE_ID as string,
+        process.env.CLICKUP_EXPENSE_CONCEPTS_LIST_ID as string,
+        createExpenseConceptBody
+      );
 
       action = "Creating advance task";
       const bodyCFAdvance = [
@@ -294,6 +305,12 @@ export const purchaseOrder = onRequest(async (req, res) => {
         {
           id: ADVANCES_CF_IDS.PURCHARSE_ORDER_NUMBER,
           value: poRequest.orderNumber
+        },
+        {
+          id: ADVANCES_CF_IDS.EXPENSE_CONCEPT_LINK,
+          value: {
+            add: [clickupExpenseConceptTaskId]
+          }
         }
       ];
 
@@ -306,28 +323,6 @@ export const purchaseOrder = onRequest(async (req, res) => {
       const clickupAdvanceTaskId = await createTask(
         process.env.CLICKUP_ADVANCES_LIST_ID as string,
         createAdvanceBody
-      );
-
-      action = "Creating expense concept task";
-      const bodyCFExpenseConcept = [
-        {
-          id: EXPENSE_CONCEPTS_CF_IDS.ADVANCES_LINK,
-          value: {
-            add: [clickupAdvanceTaskId]
-          }
-        }
-      ];
-
-      const createExpenseConceptBody: createClickUpTaskBody = {
-        name: poRequest.orderNumber,
-        custom_fields: bodyCFExpenseConcept
-      };
-
-      action = "Sending create expense concept task request to ClickUp";
-      const clickupExpenseConceptTaskId = await createTaskFromTemplate(
-        process.env.CLICKUP_EC_TASK_TEMPLATE_ID as string,
-        process.env.CLICKUP_EXPENSE_CONCEPTS_LIST_ID as string,
-        createExpenseConceptBody
       );
 
       action = "Updating next purchase order number";
