@@ -62,7 +62,7 @@ export const loadSkus = onRequest(async (req, res) => {
               transitStock: parseInt(row["Inventario en tránsito (number)"]) || 0,
               monthsCoverage: parseFloat(row["Meses cobertura (number)"]) || 0,
               sellingPrice: parseFloat(row["Precio venta (number)"]) || 0,
-              avgMonthlySales: parseFloat(row["Promedio venta mensual (formula)"]) || 0,
+              avgMonthlySales: parseFloat(row["Promedio ventas mensual (number)"]) || 0,
               breakpoint: parseInt(row["Punto de quiebre (number)"]) || 0,
               size: row["Tamaño (short text)"] || "",
               type: row["Tipo (drop down)"] || "",

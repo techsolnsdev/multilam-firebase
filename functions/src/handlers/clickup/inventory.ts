@@ -7,7 +7,7 @@ import { Sku } from "../../models/sku";
 import { db } from "../../index";
 
 
-const getCustomFieldValue = (customField: CustomField | CustomFieldTask, customFieldId: string): string | null => {
+const getCustomFieldValue = (customField: CustomField, customFieldId: string): string | null => {
   if (customField.type === "drop_down" && customField.type_config?.options) {
     const option = customField.type_config.options.find(
       (opt) => opt.id === customFieldId
@@ -17,8 +17,23 @@ const getCustomFieldValue = (customField: CustomField | CustomFieldTask, customF
   return null;
 }
 
+const getCustomFieldValueFromTask = (customField: CustomFieldTask, customFieldValue: number | string | null): string | null => {
+  if (!customFieldValue) {
+    return null;
+  }
+  if (customField.type === "drop_down" && customField.type_config?.options) {
+    const option = customField.type_config.options.find(
+      (opt) => opt.orderindex === customFieldValue
+    );
+    return option ? option.name : null;
+  }
+  return null;
+}
+
 export const inventory = onRequest(async (req, res) => {
   let action = "";
+  res.status(200).send("ok");
+
   try {
 
     if (req.method !== "POST") {
@@ -45,6 +60,7 @@ export const inventory = onRequest(async (req, res) => {
       res.status(401).send("Invalid signature");;
       return;
     }
+
 
     action = "Parsing webhook payload";
     const data = req.body as ClickupWebhook;
@@ -102,7 +118,7 @@ export const inventory = onRequest(async (req, res) => {
             case "Precio venta":
               updatedData["sellingPrice"] = value ? Number(value) : null;
               break;
-            case "Promedio venta mensual":
+            case "Promedio ventas mensual":
               updatedData["avgMonthlySales"] = value ? Number(value) : null;
               break;
             case "Punto de quiebre":
@@ -175,7 +191,7 @@ export const inventory = onRequest(async (req, res) => {
           case "Precio venta":
             skuData["sellingPrice"] = field.value ? Number(field.value) : null;
             break;
-          case "Promedio venta mensual":
+          case "Promedio ventas mensual":
             skuData["avgMonthlySales"] = field.value ? Number(field.value) : null;
             break;
           case "Punto de quiebre":
@@ -185,7 +201,7 @@ export const inventory = onRequest(async (req, res) => {
             skuData["size"] = field.value ? String(field.value) : null;
             break;
           case "Tipo":
-            skuData["type"] = getCustomFieldValue(field, field.id);
+            skuData["type"] = getCustomFieldValueFromTask(field, field.value ?? null);
             break;
         }
       });
@@ -209,21 +225,15 @@ export const inventory = onRequest(async (req, res) => {
         size: skuData.size,
         type: skuData.type,
         isActive: skuData.isActive,
-        createdAt: skuData.createdAt,
-        updatedAt: skuData.updatedAt,
+        createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       console.log("SKU data:", skuData);
 
       await db.collection("skus").doc(data.task_id).set(sku);
 
-      
-      
     }
-    action = "Processing history items";
-
-    res.status(200).send("Webhook processed successfully");
-
   } catch (error) {
     console.error(`Error during action: ${action}`, error);
   }

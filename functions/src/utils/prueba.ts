@@ -101,7 +101,7 @@ type ClickUpWebhookPayload = {
   list_id?: string;
   task?: { id?: string };
   list?: { id?: string };
-  history_items?: Array<{ custom_field?: { id?: string }; before?: unknown; after?: unknown;[k: string]: unknown }>;
+  history_items?: Array<{ custom_field?: { id?: string }; before?: unknown; after?: unknown; field?: string; [k: string]: unknown }>;
   [k: string]: unknown;
 };
 
@@ -515,9 +515,16 @@ export const poEtaUpdate = onRequest(
       const historyItem = event.history_items?.[0];
 
       const changedCfId = historyItem?.custom_field?.id;
-
+      
       console.log("[STEP 0] Campo modificado:", changedCfId ?? "(no disponible)");
 
+      const typeField = historyItem?.field;
+
+      if (typeField !== "custom_field") {
+        console.log("[STEP 0] ⏭️ Campo irrelevante. Ignorando.");
+        return;
+      }
+      
       if (changedCfId !== undefined) {
         // Si es un campo que nosotros mismos escribimos → loop → abortar
         if (PO_SYSTEM_OUTPUT_CF_IDS.has(changedCfId)) {
